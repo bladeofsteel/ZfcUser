@@ -110,6 +110,10 @@ class User extends EventProvider
         return true;
     }
 
+    public function sendConfirmation(UserModel $user)
+    {
+    }
+
     public function generateActivationCode($email)
     {
         return sha1($email);
