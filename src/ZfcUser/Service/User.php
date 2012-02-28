@@ -27,6 +27,11 @@ class User extends EventProvider
     protected $userMetaMapper;
 
     /**
+     * @var UserActivationMapper
+     */
+    protected $userActivationMapper;
+
+    /**
      * @var mixed
      */
     protected $resolvedIdentity;
@@ -191,6 +196,18 @@ class User extends EventProvider
     public function setUserMetaMapper(UserMetaMapperInterface $userMetaMapper)
     {
         $this->userMetaMapper = $userMetaMapper;
+        return $this;
+    }
+
+    /**
+     * setUserActivationMapper
+     *
+     * @param UserActivationMapper $userActivationMapper
+     * @return User
+     */
+    public function setUserActivationMapper(UserActivationMapper $userActivationMapper)
+    {
+        $this->userActivationMapper = $userActivationMapper;
         return $this;
     }
 
