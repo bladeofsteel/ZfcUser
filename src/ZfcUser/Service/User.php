@@ -12,7 +12,8 @@ use Zend\Authentication\AuthenticationService,
     ZfcUser\Model\UserMapperInterface,
     ZfcUser\Model\UserMetaMapperInterface,
     ZfcUser\Module as ZfcUser,
-    ZfcBase\EventManager\EventProvider;
+    ZfcBase\EventManager\EventProvider,
+    ZfcBase\Util;
 
 class User extends EventProvider
 {
@@ -142,7 +143,7 @@ class User extends EventProvider
 
         $template = ZfcUser::getOption('email_activation_body');
         $renderer = $this->getLocator()->get('Zend\View\Renderer\PhpRenderer');
-        $viewParams = array('code' => $this->generateActivationCode($user->getEmail()),
+        $viewParams = array('code' => Util\String::getRandomBytes(16),
                             'user' => $user->getUserId());
         $body = $renderer->render($template, $viewParams);
 
@@ -153,15 +154,6 @@ class User extends EventProvider
             return false;
         }
         return true;
-    }
-
-    /**
-     * @param $email
-     * @return string
-     */
-    public function generateActivationCode($email)
-    {
-        return sha1($email);
     }
 
     /**
