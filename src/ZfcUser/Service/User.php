@@ -9,6 +9,7 @@ use Zend\Authentication\AuthenticationService,
     Zend\Mail\Message as MailMessage,
     DateTime,
     ZfcUser\Util\Password,
+    ZfcUser\Model\UserActivationMapperInterface,
     ZfcUser\Model\UserMapperInterface,
     ZfcUser\Model\UserMetaMapperInterface,
     ZfcUser\Module as ZfcUser,
@@ -28,7 +29,7 @@ class User extends EventProvider
     protected $userMetaMapper;
 
     /**
-     * @var UserActivationMapper
+     * @var UserActivationMapperInterface
      */
     protected $userActivationMapper;
 
@@ -194,10 +195,10 @@ class User extends EventProvider
     /**
      * setUserActivationMapper
      *
-     * @param UserActivationMapper $userActivationMapper
+     * @param UserActivationMapperInterface $userActivationMapper
      * @return User
      */
-    public function setUserActivationMapper(UserActivationMapper $userActivationMapper)
+    public function setUserActivationMapper(UserActivationMapperInterface $userActivationMapper)
     {
         $this->userActivationMapper = $userActivationMapper;
         return $this;
