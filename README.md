@@ -116,6 +116,54 @@ Coming soon...
             ),
         );
 
+### Post-Install: Zend\Mail
+
+1. If you do not already have a PDO connection set up via DI, put the following
+   in `./config/autoload/mail.config.php`:
+
+        <?php
+        // ./config/autoload/mail.config.php
+
+        return array(
+            'di' => array(
+                'definition' => array('class' => array(
+                    'Zend\Mail\Transport\Smtp' => array(
+                        'setOptions' => array(
+                            'required' => true,
+                            'options'  => array(
+                                'required' => true,
+                                'type'     => 'Zend\Mail\Transport\SmtpOptions',
+                            ),
+                        ),
+                    ),
+                )),
+                'instance' => array(
+                    'preferences' => array(
+                        'Zend\Mail\Transport'  => 'Zend\Mail\Transport\Smtp',
+                    ),
+
+                    'Zend\Mail\Message' => array('parameters' => array(
+                        'Zend\Mail\Message::addFrom:emailOrAddressList'   => '<EMAIL HERE>',
+                        'Zend\Mail\Message::addFrom:name'                 => '<NAME HERE>',
+                        'Zend\Mail\Message::setSender:emailOrAddressList' => '<EMAIL HERE>',
+                        'Zend\Mail\Message::setSender:name'               => '<NAME HERE>',
+                    )),
+                    'Zend\Mail\Transport\SmtpOptions' => array('parameters' => array(
+                        'host'             => 'smtp.gmail.com',
+                        'port'             => 587,
+                        'connectionClass'  => 'login',
+                        'connectionConfig' => array(
+                            'ssl'      => 'tls',
+                            'username' => '<USERNAME HERE>',
+                            'password' => '<PASSWORD HERE>',
+                        ),
+                    )),
+                ),
+            ),
+        );
+
+This is show how to configure using GMail as your SMTP server
+
 2. Now, specify the DI alias for your PDO connection in
    `./configs/autoload/module.zfcuser.config.php`, under the 'zend_db_adapter' setting.
    If you created the `./config/autoload/database.config.php` file in the

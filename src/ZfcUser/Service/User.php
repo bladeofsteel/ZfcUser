@@ -6,10 +6,11 @@ use Zend\Authentication\AuthenticationService,
     Zend\Form\Form,
     Zend\EventManager\ListenerAggregate,
     Zend\Mail\Transport,
-    Zend\Mail\Message as MailMessage,
+    Zend\Mail\Message,
     DateTime,
     ZfcUser\Util\Password,
     ZfcUser\Model\UserActivationMapperInterface,
+    ZfcUser\Model\UserInterface,
     ZfcUser\Model\UserMapperInterface,
     ZfcUser\Model\UserMetaMapperInterface,
     ZfcUser\Module as ZfcUser,
@@ -135,22 +136,20 @@ class User extends EventProvider
     }
 
     /**
-     * @param \ZfcUser\Model\User $user
+     * @param \ZfcUser\Model\UserInterface $user
      * @return bool
      */
-    public function sendConfirmation(UserModel $user)
+    public function sendConfirmation(UserInterface $user)
     {
-        $transport = $this->getMailTransport();
-
         $template = ZfcUser::getOption('email_activation_body');
         $renderer = $this->getLocator()->get('Zend\View\Renderer\PhpRenderer');
         $viewParams = array('code' => Util\String::getRandomBytes(16),
                             'user' => $user->getUserId());
         $body = $renderer->render($template, $viewParams);
 
-        $message = $this->getMailMessage()->setTo($user->getEmail())->setBody($body);
+        $message = $this->message->setTo($user->getEmail())->setBody($body);
         try {
-            $transport->send($message);
+            $this->mailTransport->send($message);
         } catch (\Exception $e) {
             return false;
         }
@@ -252,45 +251,15 @@ class User extends EventProvider
     }
 
     /**
-     * Return instance of mail transport
-     *
-     * @return \Zend\Mail\Transport
-     */
-    protected function getMailTransport()
-    {
-        if (null === $this->mailTransport) {
-            $class = ZfcUser::getOption('mail_transport');
-            $this->mailTransport = new $class;
-        }
-        return $this->mailTransport;
-    }
-
-    /**
      * Set mail transport instance
      *
      * @param \Zend\Mail\Transport $mailTransport
      * @return User
      */
-    public function setMailTransport(\Zend\Mail\Transport $mailTransport)
+    public function setMailTransport(Transport $mailTransport)
     {
         $this->mailTransport = $mailTransport;
         return $this;
-    }
-
-    /**
-     * Get or prepare mail message
-     *
-     * @return \Zend\Mail\Message
-     */
-    protected function getMailMessage()
-    {
-        if (null === $this->message) {
-            $message = new \Zend\Mail\Message();
-            $message->setFrom(ZfcUser::getOption('email_activation_from'))
-                ->setSubject(ZfcUser::getOption('email_activation_subject'));
-            $this->message = $message;
-        }
-        return $this->message;
     }
 
     /**

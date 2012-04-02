@@ -9,9 +9,6 @@ return array(
         'require_activation'        => false,
         'login_after_registration'  => true,
         'registration_form_captcha' => true,
-        'mail_transport'            => 'Zend\Mail\Transport\Sendmail',
-        'email_activation_from'     => 'no-answer@project.com',
-        'email_activation_subject'  => '[Project] Confirm your email',
         'email_activation_body'     => 'zfcuser/_activation_email',
         'password_hash_algorithm'   => 'blowfish', // blowfish, sha512, sha256
         'blowfish_cost'             => 10,         // integer between 4 and 31
@@ -19,7 +16,66 @@ return array(
         'sha512_rounds'             => 5000,       // integer between 1000 and 999,999,999
     ),
     'di' => array(
+        'definition' => array('class' => array(
+            'ZfcUser\Service\User' => array(
+                'setMessage' => array(
+                    'required' => true,
+                    'message'  => array(
+                        'required' => true,
+                        'type'     => 'Zend\Mail\Message',
+                    ),
+                ),
+                'setMailTransport' => array(
+                    'required'  => true,
+                    'transport' => array(
+                        'required' => true,
+                        'type'     => 'Zend\Mail\Transport',
+                    ),
+                ),
+            ),
+            'Zend\Mail\Message' => array(
+                'addTo'     => array(
+                    'emailOrAddressList' => array(
+                        'type'     => false,
+                        'required' => true,
+                    ),
+                    'name'               => array(
+                        'type'     => false,
+                        'required' => false,
+                    ),
+                ),
+                'addFrom'   => array(
+                    'emailOrAddressList' => array(
+                        'type'     => false,
+                        'required' => true,
+                    ),
+                    'name'               => array(
+                        'type'     => false,
+                        'required' => false,
+                    ),
+                ),
+                'setSender' => array(
+                    'emailOrAddressList' => array(
+                        'type'     => false,
+                        'required' => true,
+                    ),
+                    'name'               => array(
+                        'type'     => false,
+                        'required' => false,
+                    ),
+                ),
+                'setSubject' => array(
+                    'subject'      => array(
+                        'type'     => false,
+                        'required' => true,
+                    ),
+                ),
+            ),
+        )),
         'instance' => array(
+            'preferences' => array(
+                'Zend\Mail\Transport'  => 'Zend\Mail\Transport\Sendmail',
+            ),
             'alias' => array(
                 'zfcuser'                          => 'ZfcUser\Controller\UserController',
                 'zfcuser_user_service'             => 'ZfcUser\Service\User',
@@ -27,6 +83,8 @@ return array(
                 'zfcuser_uemail_validator'         => 'ZfcUser\Validator\NoRecordExists',
                 'zfcuser_uusername_validator'      => 'ZfcUser\Validator\NoRecordExists',
                 'zfcuser_captcha_element'          => 'Zend\Form\Element\Captcha',
+                'zfcuser_mail_message'             => 'Zend\Mail\Message',
+
 
                 // Default Zend\Db
                 'zfcuser_zend_db_adapter' => 'Zend\Db\Adapter\Adapter',
@@ -102,6 +160,8 @@ return array(
                     'authService'    => 'zfcuser_auth_service',
                     'userMapper'     => 'zfcuser_user_mapper',
                     'userMetaMapper' => 'zfcuser_usermeta_mapper',
+                    'message'        => 'zfcuser_mail_message',
+                    'mailTransport'  => 'Zend\Mail\Transport'
                 ),
             ),
             'ZfcUser\Form\Register' => array(
@@ -127,6 +187,13 @@ return array(
                     ),
                 ),
             ),
+            'Zend\Mail\Message' => array('parameters' => array(
+                'Zend\Mail\Message::addFrom:emailOrAddressList'   => 'EMAIL HERE',
+                'Zend\Mail\Message::addFrom:name'                 => 'NAME HERE',
+                'Zend\Mail\Message::setSender:emailOrAddressList' => 'EMAIL HERE',
+                'Zend\Mail\Message::setSender:name'               => 'NAME HERE',
+                'Zend\Mail\Message::setSubject:subject'           => 'SUBJECT HERE',
+            )),
 
             /**
              * Mapper / DB
